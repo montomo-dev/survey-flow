@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Survey Flow</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <section class="screen active" id="screen-welcome">
+      <div class="card">
+        <div class="logo">&#x1F4CB;</div>
+        <h1>アンケートにご協力ください</h1>
+        <p>所要時間は約 <strong>2〜3分</strong>です。<br />いくつかの質問にお答えください。</p>
+        <button class="btn btn-primary" onclick="startSurvey()">はじめる</button>
+      </div>
+    </section>
+
+    <!-- Questions -->
+    <section class="screen" id="screen-questions">
+      <div class="card question-card">
+        <div class="question-counter" id="questionCounter">1 / 6</div>
+        <div class="question-wrap" id="questionWrap"></div>
+        <div class="nav-buttons">
+          <button class="btn btn-ghost" id="btnBack" onclick="prevQuestion()">← 戻る</button>
+          <button class="btn btn-primary" id="btnNext" onclick="nextQuestion()">次へ →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result Screen -->
+    <section class="screen" id="screen-result">
+      <div class="card result-card">
+        <div class="check-icon">&#x2713;</div>
+        <h2>ご回答ありがとうございました！</h2>
+        <p>あなたの回答を受け付けました。</p>
+        <div class="result-summary" id="resultSummary"></div>
+        <button class="btn btn-primary" onclick="restartSurvey()">もう一度回答する</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
