@@ -89,8 +89,17 @@ function renderQuestion() {
     q.options.forEach(opt => {
       const item = document.createElement('label');
       item.className = 'option-item' + (saved === opt ? ' selected' : '');
-      item.innerHTML = `<input type="radio" name="${q.id}" value="${opt}" /><span class="option-dot"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = q.id;
+      input.value = opt;
+      input.checked = saved === opt;
+      const dot = document.createElement('span');
+      dot.className = 'option-dot';
+      const text = document.createElement('span');
+      text.textContent = opt;
+      item.append(input, dot, text);
+      input.addEventListener('change', () => {
         opts.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
         answers[q.id] = opt;
@@ -106,15 +115,20 @@ function renderQuestion() {
     q.options.forEach(opt => {
       const item = document.createElement('label');
       item.className = 'option-item' + (checked.includes(opt) ? ' selected' : '');
-      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}" /><span class="option-check"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
-        item.classList.toggle('selected');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.name = q.id;
+      input.value = opt;
+      input.checked = checked.includes(opt);
+      const box = document.createElement('span');
+      box.className = 'option-check';
+      const text = document.createElement('span');
+      text.textContent = opt;
+      item.append(input, box, text);
+      input.addEventListener('change', () => {
+        item.classList.toggle('selected', input.checked);
         const cur = answers[q.id] || [];
-        if (item.classList.contains('selected')) {
-          answers[q.id] = [...cur, opt];
-        } else {
-          answers[q.id] = cur.filter(v => v !== opt);
-        }
+        answers[q.id] = input.checked ? [...cur, opt] : cur.filter(v => v !== opt);
       });
       opts.appendChild(item);
     });
@@ -123,12 +137,16 @@ function renderQuestion() {
   } else if (q.type === 'stars') {
     const group = document.createElement('div');
     group.className = 'star-group';
+    group.setAttribute('role', 'group');
+    group.setAttribute('aria-label', q.label);
     let hovered = saved || 0;
     const stars = [];
     for (let i = 1; i <= q.max; i++) {
-      const s = document.createElement('span');
+      const s = document.createElement('button');
+      s.type = 'button';
       s.className = 'star' + (i <= hovered ? ' active' : '');
       s.textContent = '★';
+      s.setAttribute('aria-label', `${i} / ${q.max}`);
       s.dataset.val = i;
       s.addEventListener('mouseenter', () => {
         stars.forEach((st, idx) => st.classList.toggle('active', idx < i));
@@ -151,6 +169,7 @@ function renderQuestion() {
     const btns = [];
     for (let i = q.min; i <= q.max; i++) {
       const b = document.createElement('button');
+      b.type = 'button';
       b.className = 'scale-btn' + (saved === i ? ' active' : '');
       b.textContent = i;
       b.addEventListener('click', () => {
@@ -163,7 +182,11 @@ function renderQuestion() {
     }
     const lbl = document.createElement('div');
     lbl.className = 'scale-labels';
-    lbl.innerHTML = `<span>${q.labelMin}</span><span>${q.labelMax}</span>`;
+    const lo = document.createElement('span');
+    lo.textContent = q.labelMin;
+    const hi = document.createElement('span');
+    hi.textContent = q.labelMax;
+    lbl.append(lo, hi);
     wrap.appendChild(group);
     wrap.appendChild(lbl);
 
@@ -171,6 +194,7 @@ function renderQuestion() {
     const ta = document.createElement('textarea');
     ta.className = 'text-input';
     ta.placeholder = q.placeholder || '';
+    ta.setAttribute('aria-label', q.label);
     ta.value = saved || '';
     ta.addEventListener('input', () => { answers[q.id] = ta.value; });
     wrap.appendChild(ta);
@@ -207,7 +231,13 @@ function showResult() {
     const item = document.createElement('div');
     item.className = 'result-item';
     const display = Array.isArray(val) ? val.join('、') : (q.type === 'stars' ? '★'.repeat(val) : String(val));
-    item.innerHTML = `<div class="q">${q.label}</div><div class="a">${display || '（未回答）'}</div>`;
+    const qEl = document.createElement('div');
+    qEl.className = 'q';
+    qEl.textContent = q.label;
+    const aEl = document.createElement('div');
+    aEl.className = 'a';
+    aEl.textContent = display || '（未回答）';
+    item.append(qEl, aEl);
     summary.appendChild(item);
   });
 }

@@ -149,7 +149,18 @@ p strong { color: var(--primary); }
   color: var(--primary);
   font-weight: 600;
 }
-.option-item input { display: none; }
+.option-item { position: relative; }
+/* display:none だとキーボードで選べないので、見えないだけにする */
+.option-item input {
+  position: absolute;
+  opacity: 0;
+  width: 1px; height: 1px;
+  pointer-events: none;
+}
+.option-item:has(input:focus-visible) {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
 .option-dot {
   width: 20px; height: 20px;
   border-radius: 50%;
@@ -190,6 +201,10 @@ p strong { color: var(--primary); }
 /* Stars */
 .star-group { display: flex; gap: 12px; margin-top: 8px; }
 .star {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
   font-size: 40px;
   cursor: pointer;
   color: #d1d5db;
@@ -284,4 +299,13 @@ h2 { font-size: 1.4rem; margin-bottom: 10px; }
 @media (max-width: 480px) {
   .card { padding: 32px 24px; }
   .star { font-size: 32px; }
+}
+
+/* キーボード操作のフォーカス表示 */
+.star:focus-visible,
+.scale-btn:focus-visible,
+.btn:focus-visible,
+.text-input:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
