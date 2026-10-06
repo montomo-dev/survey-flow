@@ -91,15 +91,29 @@ p strong { color: var(--primary); }
   transition: all 0.2s ease;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary), #a78bfa);
+  /* 白文字が読める濃さ(4.5:1以上)に収まるグラデーション。終点は旧 #a78bfa だと 2.7:1 だった */
+  background: linear-gradient(135deg, var(--primary-dark), #8057f8);
   color: #fff;
   box-shadow: 0 4px 20px rgba(108,99,255,0.35);
 }
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 28px rgba(108,99,255,0.45);
 }
-.btn-primary:active { transform: translateY(0); }
+.btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn:focus-visible,
+.scale-btn:focus-visible,
+.star:focus-visible,
+.text-input:focus-visible {
+  outline: 3px solid var(--primary-dark);
+  outline-offset: 3px;
+}
 
 .btn-ghost {
   background: transparent;
@@ -146,10 +160,19 @@ p strong { color: var(--primary); }
 .option-item.selected {
   border-color: var(--primary);
   background: #ede9ff;
-  color: var(--primary);
+  color: var(--primary-dark); /* #6C63FF だと選択色の背景に対して 3.6:1 で足りない */
   font-weight: 600;
 }
-.option-item input { display: none; }
+.option-item { position: relative; }
+/* display:none だとキーボードで選べないので、見えないだけにして残す */
+.option-item input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.option-item:focus-within { outline: 3px solid var(--primary-dark); outline-offset: 3px; }
 .option-dot {
   width: 20px; height: 20px;
   border-radius: 50%;
@@ -190,9 +213,13 @@ p strong { color: var(--primary); }
 /* Stars */
 .star-group { display: flex; gap: 12px; margin-top: 8px; }
 .star {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
   font-size: 40px;
   cursor: pointer;
-  color: #d1d5db;
+  color: #8a91a0; /* 空の星。旧 #d1d5db は白背景に対して 1.5:1 で見えにくかった */
   transition: all 0.15s ease;
   line-height: 1;
 }
@@ -244,7 +271,7 @@ p strong { color: var(--primary); }
   margin-top: 36px;
 }
 #btnBack { opacity: 1; transition: opacity 0.2s; }
-#btnBack.hidden { opacity: 0; pointer-events: none; }
+#btnBack.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
 
 /* Result */
 .result-card { text-align: center; }
@@ -284,4 +311,8 @@ h2 { font-size: 1.4rem; margin-bottom: 10px; }
 @media (max-width: 480px) {
   .card { padding: 32px 24px; }
   .star { font-size: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }
