@@ -89,8 +89,8 @@ function renderQuestion() {
     q.options.forEach(opt => {
       const item = document.createElement('label');
       item.className = 'option-item' + (saved === opt ? ' selected' : '');
-      item.innerHTML = `<input type="radio" name="${q.id}" value="${opt}" /><span class="option-dot"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
+      item.innerHTML = `<input type="radio" name="${q.id}" value="${opt}"${saved === opt ? ' checked' : ''} /><span class="option-dot"></span><span>${opt}</span>`;
+      item.querySelector('input').addEventListener('change', () => {
         opts.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
         item.classList.add('selected');
         answers[q.id] = opt;
@@ -106,11 +106,12 @@ function renderQuestion() {
     q.options.forEach(opt => {
       const item = document.createElement('label');
       item.className = 'option-item' + (checked.includes(opt) ? ' selected' : '');
-      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}" /><span class="option-check"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
-        item.classList.toggle('selected');
+      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}"${checked.includes(opt) ? ' checked' : ''} /><span class="option-check"></span><span>${opt}</span>`;
+      // labelのclickだと入力要素の合成clickと合わせて2回発火し、選択が打ち消されるためchangeを使う
+      item.querySelector('input').addEventListener('change', e => {
+        item.classList.toggle('selected', e.target.checked);
         const cur = answers[q.id] || [];
-        if (item.classList.contains('selected')) {
+        if (e.target.checked) {
           answers[q.id] = [...cur, opt];
         } else {
           answers[q.id] = cur.filter(v => v !== opt);
