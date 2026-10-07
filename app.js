@@ -106,15 +106,13 @@ function renderQuestion() {
     q.options.forEach(opt => {
       const item = document.createElement('label');
       item.className = 'option-item' + (checked.includes(opt) ? ' selected' : '');
-      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}" /><span class="option-check"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
-        item.classList.toggle('selected');
+      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}"${checked.includes(opt) ? ' checked' : ''} /><span class="option-check"></span><span>${opt}</span>`;
+      // label内のinputは合成クリックでもう一度クリックを発火するため、
+      // labelのclickではなくinputのchangeで受ける(二重トグル防止)
+      item.querySelector('input').addEventListener('change', e => {
+        item.classList.toggle('selected', e.target.checked);
         const cur = answers[q.id] || [];
-        if (item.classList.contains('selected')) {
-          answers[q.id] = [...cur, opt];
-        } else {
-          answers[q.id] = cur.filter(v => v !== opt);
-        }
+        answers[q.id] = e.target.checked ? [...cur, opt] : cur.filter(v => v !== opt);
       });
       opts.appendChild(item);
     });
