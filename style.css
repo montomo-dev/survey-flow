@@ -149,7 +149,15 @@ p strong { color: var(--primary); }
   color: var(--primary);
   font-weight: 600;
 }
-.option-item input { display: none; }
+.option-item { position: relative; }
+/* display:noneだとキーボードで選べないので、見えないだけにしてフォーカス可能にする */
+.option-item input {
+  position: absolute;
+  opacity: 0;
+  width: 1px; height: 1px;
+  pointer-events: none;
+}
+.option-item:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
 .option-dot {
   width: 20px; height: 20px;
   border-radius: 50%;

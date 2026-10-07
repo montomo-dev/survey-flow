@@ -83,37 +83,38 @@ function renderQuestion() {
 
   const saved = answers[q.id];
 
-  if (q.type === 'radio') {
+  if (q.type === 'radio' || q.type === 'checkbox') {
+    const isRadio = q.type === 'radio';
     const opts = document.createElement('div');
     opts.className = 'options';
     q.options.forEach(opt => {
+      const checked = isRadio ? saved === opt : (saved || []).includes(opt);
       const item = document.createElement('label');
-      item.className = 'option-item' + (saved === opt ? ' selected' : '');
-      item.innerHTML = `<input type="radio" name="${q.id}" value="${opt}" /><span class="option-dot"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
-        opts.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
-        item.classList.add('selected');
-        answers[q.id] = opt;
-      });
-      opts.appendChild(item);
-    });
-    wrap.appendChild(opts);
+      item.className = 'option-item' + (checked ? ' selected' : '');
 
-  } else if (q.type === 'checkbox') {
-    const checked = saved || [];
-    const opts = document.createElement('div');
-    opts.className = 'options';
-    q.options.forEach(opt => {
-      const item = document.createElement('label');
-      item.className = 'option-item' + (checked.includes(opt) ? ' selected' : '');
-      item.innerHTML = `<input type="checkbox" name="${q.id}" value="${opt}" /><span class="option-check"></span><span>${opt}</span>`;
-      item.addEventListener('click', () => {
-        item.classList.toggle('selected');
-        const cur = answers[q.id] || [];
-        if (item.classList.contains('selected')) {
-          answers[q.id] = [...cur, opt];
+      const input = document.createElement('input');
+      input.type = q.type;
+      input.name = q.id;
+      input.value = opt;
+      input.checked = checked;
+
+      const mark = document.createElement('span');
+      mark.className = isRadio ? 'option-dot' : 'option-check';
+      const text = document.createElement('span');
+      text.textContent = opt;
+      item.append(input, mark, text);
+
+      // label全体のclickではなく、入力要素のchangeで状態を持つ
+      // (label内のinputはclickが2回発火するため、checkboxが打ち消し合って選べなくなる)
+      input.addEventListener('change', () => {
+        if (isRadio) {
+          opts.querySelectorAll('.option-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          answers[q.id] = opt;
         } else {
-          answers[q.id] = cur.filter(v => v !== opt);
+          item.classList.toggle('selected', input.checked);
+          const cur = answers[q.id] || [];
+          answers[q.id] = input.checked ? [...cur, opt] : cur.filter(v => v !== opt);
         }
       });
       opts.appendChild(item);
@@ -207,7 +208,13 @@ function showResult() {
     const item = document.createElement('div');
     item.className = 'result-item';
     const display = Array.isArray(val) ? val.join('、') : (q.type === 'stars' ? '★'.repeat(val) : String(val));
-    item.innerHTML = `<div class="q">${q.label}</div><div class="a">${display || '（未回答）'}</div>`;
+    const qEl = document.createElement('div');
+    qEl.className = 'q';
+    qEl.textContent = q.label;
+    const aEl = document.createElement('div');
+    aEl.className = 'a';
+    aEl.textContent = display || '（未回答）';
+    item.append(qEl, aEl);
     summary.appendChild(item);
   });
 }
