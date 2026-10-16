@@ -207,7 +207,13 @@ function showResult() {
     const item = document.createElement('div');
     item.className = 'result-item';
     const display = Array.isArray(val) ? val.join('、') : (q.type === 'stars' ? '★'.repeat(val) : String(val));
-    item.innerHTML = `<div class="q">${q.label}</div><div class="a">${display || '（未回答）'}</div>`;
+    const qEl = document.createElement('div');
+    qEl.className = 'q';
+    qEl.textContent = q.label;
+    const aEl = document.createElement('div');
+    aEl.className = 'a';
+    aEl.textContent = display || '（未回答）';
+    item.append(qEl, aEl);
     summary.appendChild(item);
   });
 }
